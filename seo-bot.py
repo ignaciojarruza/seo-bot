@@ -1,5 +1,6 @@
 from openai import OpenAI
 import argparse
+import json
 import os
 
 api_key = os.environ.get('OPENAI_API_KEY')
@@ -17,6 +18,11 @@ Simply input your article or text description, and let the SEO Bot provide you w
 insights to enhance your online visibility and drive organic traffic. Let's get started!\n
 """
 
+system_prompt = """
+You are a search engine optimizer bot. You will take a description as input and output 3 different things: a list of recommended subject titles,
+ a summary description for search engine optimization and a list of keywords separated by commas. These will be titled in the response as titles, description, and keywords. 
+"""
+
 def generate_recommendations(text):
     # Call openai API
     client = OpenAI(
@@ -24,6 +30,10 @@ def generate_recommendations(text):
     )
     seo_recommendations = client.chat.completions.create(
         messages = [
+            {
+                "role":"system",
+                "content":system_prompt,
+            },
             {
                 "role":"user",
                 "content": text,
@@ -42,12 +52,14 @@ def main():
             print("Exiting the program...")
             break
 
-        print(user_input)
+        seo_recommendations = generate_recommendations(user_input)
+        #convert response to json
+        parsed_resonse = json.loads(seo_recommendations)
+        recommended_titles = parsed_resonse["titles"]
+        recommended_summary = parsed_resonse["description"]
+        recommended_keywords = parsed_resonse["keywords"]
+        print(recommended_titles)
 
-    #seo_recommendations = generate_recommendations(text)
-
-    #Output
-    print(seo_recommendations)
 
 if __name__ == "__main__":
     main()
