@@ -3,8 +3,6 @@ import argparse
 import json
 import os
 
-api_key = os.environ.get('OPENAI_API_KEY')
-
 intro_message = """
 Welcome to the SEO Bot!
 
@@ -41,7 +39,7 @@ def generate_recommendations(text):
         ],
         model="gpt-3.5-turbo",
     )
-    return seo_recommendations
+    return seo_recommendations.json()
 
 def main():
     print(intro_message)
@@ -55,10 +53,16 @@ def main():
         seo_recommendations = generate_recommendations(user_input)
         #convert response to json
         parsed_resonse = json.loads(seo_recommendations)
-        recommended_titles = parsed_resonse["titles"]
-        recommended_summary = parsed_resonse["description"]
-        recommended_keywords = parsed_resonse["keywords"]
-        print(recommended_titles)
+        response = parsed_resonse["choices"][0]["message"]["content"]
+        sections = response.split('\n\n')
+        titles = sections[0].replace('**Titles:**\n', '').split('\n')
+        description = sections[1].replace('**Description:**\n', '')
+        keywords = sections[2].replace('**Keywords:**\n', '').split(', ')
+
+        # Print or use the extracted information
+        print(titles)
+        print(description)
+        print(keywords)
 
 
 if __name__ == "__main__":
