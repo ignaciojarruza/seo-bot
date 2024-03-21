@@ -44,7 +44,15 @@ def generate_recommendations(text):
 def main():
     print(intro_message)
     while True:
-        user_input = input("Please enter your article or text description below:\n")
+        print("Please enter your article or text description below:\n")
+        lines = []
+        while True:
+            line = input()
+            if line.strip() == '--END--':
+                break
+            lines.append(line)
+        
+        user_input = '\n'.join(lines)
 
         if user_input.lower() == 'exit':
             print("Exiting the program...")
